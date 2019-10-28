@@ -4,11 +4,15 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-  },
+		"format": "prettier --single-quote --write *.js"
+	},
   "author": "",
   "license": "MIT",
   "dependencies": {
     "fuzzy-search": "^3.0.1",
     "prompts": "^2.2.1"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
   }
 }
