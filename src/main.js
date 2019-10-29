@@ -1,6 +1,6 @@
 const prompts = require('prompts');
 
-const { Future, Maybe } = require('./maybe');
+const { Future } = require('./maybe');
 const {
   create_search,
   create_suggest,
@@ -24,38 +24,29 @@ const search_word = word =>
   search(word)
     .or_else(() => search_name(word))
     .or_else(suggest_word(word))
-    .map(format)
-    .unwrap_or('');
+    .unwrap_or([]);
 
 async function main() {
-  let input = {};
-  const valid_input = val => typeof val == 'string' && val !== 'exit';
+  const invalid_input = val => typeof val != 'string' || val === 'exit';
 
   while (1) {
-    input = prompts({
+    let { value } = await prompts({
       message: 'Search a word\n',
       type: 'text',
       name: 'value'
     });
 
-    let match = await Future(input)
-      .map(answer => answer.value)
-      .filter(valid_input)
-      .map(search_word)
-      .unwrap_or(false);
-
-    if (match === false) {
+    if (invalid_input(value)) {
       break;
     }
 
-    if (match.length) {
-      console.log('Matches:\n', match, '\n');
-    } else {
-      console.log('No results found\n');
-    }
-  }
+    let match = await search_word(value);
+    let message = match.length
+      ? `Matches:\n${format(match)}`
+      : 'No results found';
 
-  process.exit(0);
+    console.log(message, '\n');
+  }
 }
 
 main().catch(e => console.error({ error: e }));
